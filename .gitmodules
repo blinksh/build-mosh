@@ -1,0 +1,3 @@
+[submodule "mosh"]
+	path = mosh
+	url = git@github.com:blinksh/mosh.git
