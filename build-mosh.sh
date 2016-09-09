@@ -39,7 +39,7 @@ buildit()
 
     export CC="$(xcrun -sdk iphoneos -find clang)"
     export CPP="$CC -E"
-    export CFLAGS="-arch ${target} -isysroot $PLATFORMPATH/$platform.platform/Developer/SDKs/$platform$SDKVERSION.sdk -miphoneos-version-min=$SDKVERSION"
+    export CFLAGS="-arch ${target} -isysroot $PLATFORMPATH/$platform.platform/Developer/SDKs/$platform$SDKVERSION.sdk -miphoneos-version-min=$SDKVERSION -I$pwd/headers"
     export AR=$(xcrun -sdk iphoneos -find ar)
     export RANLIB=$(xcrun -sdk iphoneos -find ranlib)
     export CPPFLAGS="-arch ${target}  -isysroot $PLATFORMPATH/$platform.platform/Developer/SDKs/$platform$SDKVERSION.sdk -miphoneos-version-min=$SDKVERSION"
@@ -64,9 +64,16 @@ buildit()
 
 findLatestSDKVersion iPhoneOS
 
-buildit arm64 iPhoneOS
+mkdir headers
+cd headers
+for i in ncurses.h ncurses_dll.h unctrl.h curses.h term.h ; do
+ln -s /usr/include/$i .
+done
+cd ..
+
 buildit i386 iPhoneSimulator
 buildit x86_64 iPhoneSimulator
+buildit arm64 iPhoneOS
 
 LIPO=$(xcrun -sdk iphoneos -find lipo)
 $LIPO -create $pwd/output/x86_64/libmoshcrypto.a $pwd/output/i386/libmoshcrypto.a $pwd/output/arm64/libmoshcrypto.a  -output $pwd/output/libmoshcrypto.a
