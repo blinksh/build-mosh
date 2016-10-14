@@ -1,3 +1,6 @@
 [submodule "mosh"]
 	path = mosh
 	url = git@github.com:blinksh/mosh.git
+[submodule "build-protobuf"]
+	path = build-protobuf
+	url = https://gist.github.com/9487468ae3375d0db0cc.git

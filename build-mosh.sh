@@ -1,10 +1,13 @@
 #!/bin/bash
 
-PROTOBUFDIR=`cd ../build-protobuf; pwd`
-PLATFORMPATH="/Applications/Xcode.app/Contents/Developer/Platforms"
-TOOLSPATH="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin"
-export IPHONEOS_DEPLOYMENT_TARGET="8.0"
 pwd=`pwd`
+PROTOBUFDIR="$pwd/build-protobuf/protobuf-2.6.1"
+XCODEPATH=`xcode-select --print-path`
+PLATFORMPATH="$XCODEPATH/Platforms"
+TOOLSPATH="$XCODEPATH/Toolchains/XcodeDefault.xctoolchain/usr/bin"
+
+export IPHONEOS_DEPLOYMENT_TARGET="8.0"
+
 
 findLatestSDKVersion()
 {
@@ -32,36 +35,37 @@ buildit()
     hosttarget=$1
     platform=$2
 
-    if [[ $hosttarget == "x86_64" ]]; then
-	hostarget="i386"
-    elif [[ $hosttarget == "arm64" ]]; then
-	hosttarget="arm"
-    fi
+#     if [[ $hosttarget == "x86_64" ]]; then
+# 	hosttarget="i386"
+#     elif [[ $hosttarget == "arm64" ]]; then
+# 	hosttarget="arm"
+#     fi
 
-    export ac_cv_path_PROTOC="$PROTOBUFDIR/protobuf-2.6.1/bin/protoc"
+    export ac_cv_path_PROTOC="$PROTOBUFDIR/bin/protoc"
+    export protobuf_LIBS="$PROTOBUFDIR/lib/libprotobuf.a"
+    export protobuf_CFLAGS="-I$PROTOBUFDIR/include"
     export CC="$(xcrun -sdk iphoneos -find clang)"
     export CPP="$CC -E"
-    export CFLAGS="-arch ${target} -isysroot $PLATFORMPATH/$platform.platform/Developer/SDKs/$platform$SDKVERSION.sdk -miphoneos-version-min=$SDKVERSION -I$pwd/headers -I$PROTOBUFDIR/protobuf-2.6.1/include"
+    export CFLAGS="-arch ${target} -isysroot $PLATFORMPATH/$platform.platform/Developer/SDKs/$platform$SDKVERSION.sdk -miphoneos-version-min=$SDKVERSION -I$pwd/headers"
     export AR=$(xcrun -sdk iphoneos -find ar)
     export RANLIB=$(xcrun -sdk iphoneos -find ranlib)
-    export CPPFLAGS="-arch ${target}  -isysroot $PLATFORMPATH/$platform.platform/Developer/SDKs/$platform$SDKVERSION.sdk -miphoneos-version-min=$SDKVERSION -I$PROTOBUFDIR/protobuf-2.6.1/include"
+    export CPPFLAGS="-arch ${target}  -isysroot $PLATFORMPATH/$platform.platform/Developer/SDKs/$platform$SDKVERSION.sdk -miphoneos-version-min=$SDKVERSION -I$pwd/headers"
     export LDFLAGS="-arch ${target} -isysroot $PLATFORMPATH/$platform.platform/Developer/SDKs/$platform$SDKVERSION.sdk"
 
     mkdir -p $pwd/output/$target
 
     cd $pwd/mosh
+    ./autogen.sh
     ./configure --prefix="$pwd/output/$target" --disable-server --disable-client --enable-ios-controller --host=$hosttarget-apple-darwin
     
     make clean
     make
 
-    cp "$pwd/mosh/src/crypto/libmoshcrypto.a" "$pwd/output/$target"
-    cp "$pwd/mosh/src/network/libmoshnetwork.a" "$pwd/output/$target"
-    cp "$pwd/mosh/src/protobufs/libmoshprotos.a" "$pwd/output/$target"
-    cp "$pwd/mosh/src/statesync/libmoshstatesync.a" "$pwd/output/$target"
-    cp "$pwd/mosh/src/terminal/libmoshterminal.a" "$pwd/output/$target"
-    cp "$pwd/mosh/src/frontend/libmoshios.a" "$pwd/output/$target"
-    cp "$pwd/mosh/src/util/libmoshutil.a" "$pwd/output/$target"
+    # ar + ranlib were superseded by libtool on OSX, so the makefile LIBADD won't work to create a single library
+    libtool -static -o "$pwd/output/$target/libmoshios.a" \
+	"$pwd/mosh/src/crypto/libmoshcrypto.a" "$pwd/mosh/src/network/libmoshnetwork.a" "$pwd/mosh/src/protobufs/libmoshprotos.a" \
+	"$pwd/mosh/src/statesync/libmoshstatesync.a" "$pwd/mosh/src/terminal/libmoshterminal.a" "$pwd/mosh/src/frontend/libmoshiosclient.a" \
+	"$pwd/mosh/src/util/libmoshutil.a"
 }
 
 findLatestSDKVersion iPhoneOS
@@ -73,21 +77,8 @@ ln -s /usr/include/$i .
 done
 cd ..
 
-buildit i386 iPhoneSimulator
+#buildit i386 iPhoneSimulator
 buildit x86_64 iPhoneSimulator
 buildit arm64 iPhoneOS
-
 LIPO=$(xcrun -sdk iphoneos -find lipo)
-$LIPO -create $pwd/output/x86_64/libmoshcrypto.a $pwd/output/i386/libmoshcrypto.a $pwd/output/arm64/libmoshcrypto.a  -output $pwd/output/libmoshcrypto.a
-LIPO=$(xcrun -sdk iphoneos -find lipo)
-$LIPO -create $pwd/output/x86_64/libmoshnetwork.a $pwd/output/i386/libmoshnetwork.a $pwd/output/arm64/libmoshnetwork.a -output $pwd/output/libmoshnetwork.a 
-LIPO=$(xcrun -sdk iphoneos -find lipo)
-$LIPO -create $pwd/output/x86_64/libmoshprotos.a $pwd/output/i386/libmoshprotos.a $pwd/output/arm64/libmoshprotos.a -output $pwd/output/libmoshprotos.a
-LIPO=$(xcrun -sdk iphoneos -find lipo)
-$LIPO -create $pwd/output/x86_64/libmoshios.a $pwd/output/i386/libmoshios.a $pwd/output/arm64/libmoshios.a -output $pwd/output/libmoshios.a
-LIPO=$(xcrun -sdk iphoneos -find lipo)
-$LIPO -create $pwd/output/x86_64/libmoshstatesync.a $pwd/output/i386/libmoshstatesync.a $pwd/output/arm64/libmoshstatesync.a -output $pwd/output/libmoshstatesync.a
-LIPO=$(xcrun -sdk iphoneos -find lipo)
-$LIPO -create $pwd/output/x86_64/libmoshterminal.a $pwd/output/i386/libmoshterminal.a $pwd/output/arm64/libmoshterminal.a -output $pwd/output/libmoshterminal.a
-LIPO=$(xcrun -sdk iphoneos -find lipo)
-$LIPO -create $pwd/output/x86_64/libmoshutil.a $pwd/output/i386/libmoshutil.a $pwd/output/arm64/libmoshutil.a -output $pwd/output/libmoshutil.a
+$LIPO -create $pwd/output/x86_64/libmoshios.a $pwd/output/arm64/libmoshios.a -output $pwd/output/libmoshios.a
