@@ -1,7 +1,9 @@
 #!/bin/sh
 
 echo "Building Protobuf"
-./build-protobuf/build-protobuf.sh
+cd build-protobuf
+./build-protobuf.sh
+cd ..
 echo "Building Mosh"
 ./build-mosh.sh
 ./create-libmoshios-framework.sh
