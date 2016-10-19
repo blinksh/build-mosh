@@ -7,15 +7,14 @@ Wrapper to compile Mosh for iOS. This is used to compile a library packaging Mos
 - iOS SDK.
 
 ## Building
-- Checkout submodules
 ```bash
 git submodule init
 git submodule update
+./build-all.sh
 ```
 
-- Compile
-Enable / Disable architectures from the build-mosh.sh file by commenting / uncommenting the "buildit" lines. Current supported architectures are arm64 and x86_64 due to threading code support.
+This script will build both Mosh and libprotobuf for iOS. The resulting Mosh for iOS will be packaged as libmoshios.framework on the root. The resulting libprotobuf.a will be under build-protobuf/protobuf-ver/lib.
 
-To compile, just run: ./build-mosh.sh
+If you want to customize the compilation of any piece, go to the corresopnding build-mosh or build-protobuf scripts.
 
-Output library files will be generated on the output folder. Lipo files grouping all the architectures will be created at the root, while you can also access each architecture on the corresponding folder. For installation in Blink, please copy only the Lipo files.
+Special thanks to @dariaphoebe for helping to simplify the compilation :)
