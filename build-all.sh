@@ -1,12 +1,10 @@
 #!/bin/sh
 
 cd "${BASH_SOURCE%/*}"
-echo "Building Protobuf"
-cd build-protobuf/
-./build-protobuf.sh
+curl -OL https://github.com/blinksh/build-protobuf/releases/download/2.6.1/protobuf-2.6.1.tar.gz 
 
-cd ..
+tar -zxf protobuf-2.6.1.tar.gz || { echo "Protobuf download error"; exit 1; }
+mv -f protobuf-2.6.1/ protobuf-release
+
 echo "Building Mosh"
-./build-mosh.sh
-./create-libmoshios-framework.sh
-
+./build-mosh.sh && ./create-libmoshios-framework.sh

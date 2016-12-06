@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pwd=`pwd`
-PROTOBUFDIR="$pwd/build-protobuf/protobuf-2.6.1"
+PROTOBUFDIR="$pwd/protobuf-release"
 XCODEPATH=`xcode-select --print-path`
 PLATFORMPATH="$XCODEPATH/Platforms"
 TOOLSPATH="$XCODEPATH/Toolchains/XcodeDefault.xctoolchain/usr/bin"
@@ -34,12 +34,6 @@ buildit()
     target=$1
     hosttarget=$1
     platform=$2
-
-#     if [[ $hosttarget == "x86_64" ]]; then
-# 	hosttarget="i386"
-#     elif [[ $hosttarget == "arm64" ]]; then
-# 	hosttarget="arm"
-#     fi
 
     export ac_cv_path_PROTOC="$PROTOBUFDIR/bin/protoc"
     export protobuf_LIBS="$PROTOBUFDIR/lib/libprotobuf.a"
@@ -80,5 +74,6 @@ cd ..
 #buildit i386 iPhoneSimulator
 buildit x86_64 iPhoneSimulator
 buildit arm64 iPhoneOS
+
 LIPO=$(xcrun -sdk iphoneos -find lipo)
 $LIPO -create $pwd/output/x86_64/libmoshios.a $pwd/output/arm64/libmoshios.a -output $pwd/output/libmoshios.a
