@@ -40,10 +40,10 @@ buildit()
     export protobuf_CFLAGS="-I$PROTOBUFDIR/include"
     export CC="$(xcrun -sdk iphoneos -find clang)"
     export CPP="$CC -E"
-    export CFLAGS="-arch ${target} -isysroot $PLATFORMPATH/$platform.platform/Developer/SDKs/$platform$SDKVERSION.sdk -miphoneos-version-min=$SDKVERSION -I$pwd/headers"
+    export CFLAGS="-arch ${target} -isysroot $PLATFORMPATH/$platform.platform/Developer/SDKs/$platform$SDKVERSION.sdk -miphoneos-version-min=$IPHONEOS_DEPLOYMENT_TARGET -I$pwd/headers"
     export AR=$(xcrun -sdk iphoneos -find ar)
     export RANLIB=$(xcrun -sdk iphoneos -find ranlib)
-    export CPPFLAGS="-arch ${target}  -isysroot $PLATFORMPATH/$platform.platform/Developer/SDKs/$platform$SDKVERSION.sdk -miphoneos-version-min=$SDKVERSION -I$pwd/headers"
+    export CPPFLAGS="-arch ${target}  -isysroot $PLATFORMPATH/$platform.platform/Developer/SDKs/$platform$SDKVERSION.sdk -miphoneos-version-min=$IPHONEOS_DEPLOYMENT_TARGET -I$pwd/headers"
     export LDFLAGS="-arch ${target} -isysroot $PLATFORMPATH/$platform.platform/Developer/SDKs/$platform$SDKVERSION.sdk"
 
     mkdir -p $pwd/output/$target
