@@ -71,9 +71,10 @@ ln -s /usr/include/$i .
 done
 cd ..
 
-#buildit i386 iPhoneSimulator
+buildit i386 iPhoneSimulator
+buildit armv7 iPhoneOS
 buildit x86_64 iPhoneSimulator
 buildit arm64 iPhoneOS
 
 LIPO=$(xcrun -sdk iphoneos -find lipo)
-$LIPO -create $pwd/output/x86_64/libmoshios.a $pwd/output/arm64/libmoshios.a -output $pwd/output/libmoshios.a
+$LIPO -create $pwd/output/i386/libmoshios.a $pwd/output/armv7/libmoshios.a $pwd/output/x86_64/libmoshios.a $pwd/output/arm64/libmoshios.a -output $pwd/output/libmoshios.a
