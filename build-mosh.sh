@@ -6,7 +6,7 @@ XCODEPATH=`xcode-select --print-path`
 PLATFORMPATH="$XCODEPATH/Platforms"
 TOOLSPATH="$XCODEPATH/Toolchains/XcodeDefault.xctoolchain/usr/bin"
 
-export IPHONEOS_DEPLOYMENT_TARGET="8.0"
+export IPHONEOS_DEPLOYMENT_TARGET="9.0"
 
 
 findLatestSDKVersion()
