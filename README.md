@@ -8,8 +8,7 @@ Wrapper to compile Mosh for iOS. This is used to compile a library packaging Mos
 
 ## Building
 ```bash
-git submodule init
-git submodule update
+git clone --recursive https://github.com/blinksh/build-mosh.git && cd build-mosh
 ./build-all.sh
 ```
 
